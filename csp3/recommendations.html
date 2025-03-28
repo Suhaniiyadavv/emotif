@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detected</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 30px;
+        }
+        .emotion-display {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .emotion-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
+        .emotion-icon {
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        .happy { color: #FFD700; } /* Gold */
+        .sad { color: #1E90FF; } /* DodgerBlue */
+        .excited { color: #FF4500; } /* OrangeRed */
+        .relaxed { color: #32CD32; } /* LimeGreen */
+        .angry { color: #FF0000; } /* Red */
+        .action-buttons {
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emotion Detected</h1>
+    
+    <div class="emotion-display">
+        <div class="emotion-icon" id="emotionIcon">😊</div>
+        <div class="emotion-text">You seem to be feeling: <span id="detectedEmotion"></span></div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="viewRecommendations()">View Song Recommendations</button>
+            <button class="btn btn-secondary" onclick="goBack()">Detect Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Get the detected emotion from local storage
+        const detectedEmotion = localStorage.getItem("selectedEmotion") || "happy";
+        
+        // Display the detected emotion
+        document.getElementById("detectedEmotion").textContent = 
+            detectedEmotion.charAt(0).toUpperCase() + detectedEmotion.slice(1);
+            
+        // Set appropriate emoji based on emotion
+        const emotionIcon = document.getElementById("emotionIcon");
+        switch(detectedEmotion) {
+            case 'happy':
+                emotionIcon.textContent = '😊';
+                emotionIcon.className = 'emotion-icon happy';
+                break;
+            case 'sad':
+                emotionIcon.textContent = '😢';
+                emotionIcon.className = 'emotion-icon sad';
+                break;
+            case 'excited':
+                emotionIcon.textContent = '🤩';
+                emotionIcon.className = 'emotion-icon excited';
+                break;
+            case 'relaxed':
+                emotionIcon.textContent = '😌';
+                emotionIcon.className = 'emotion-icon relaxed';
+                break;
+            case 'angry':
+                emotionIcon.textContent = '😠';
+                emotionIcon.className = 'emotion-icon angry';
+                break;
+            default:
+                emotionIcon.textContent = '😊';
+                emotionIcon.className = 'emotion-icon happy';
+        }
+        
+        // Function to view song recommendations
+        function viewRecommendations() {
+            // Store the selected emotion in local storage
+            localStorage.setItem("selectedEmotion", detectedEmotion);
+            // Redirect to songs page
+            window.location.href = "songs.html";
+        }
+        
+        // Function to go back to the index page
+        function goBack() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

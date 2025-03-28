@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .video-container {
+            margin: 20px auto;
+            width: 640px;
+            height: 480px;
+            border: 3px solid #007bff;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 27px;
+        }
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .detection-message {
+            margin: 15px 0;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Emotion Detection</h1>
+        <p>Allow camera access and click "Detect Emotion" when ready.</p>
+        
+        <div class="video-container">
+            <video id="video" width="640" height="480" autoplay muted></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn">Start Camera</button>
+            <button id="detectBtn" disabled>Detect Emotion</button>
+            <button id="recommendBtn" disabled>Get Recommendations</button>
+        </div>
+        
+        <div class="detection-message" id="detectionMessage">
+            Camera is ready. Click "Detect Emotion" to analyze your current mood.
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your emotion...</p>
+        </div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // DOM elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const startBtn = document.getElementById('startBtn');
+        const detectBtn = document.getElementById('detectBtn');
+        const recommendBtn = document.getElementById('recommendBtn');
+        const resultDiv = document.getElementById('result');
+        const loadingDiv = document.getElementById('loading');
+        const detectionMessage = document.getElementById('detectionMessage');
+        
+        // Emotion detection variables
+        let currentEmotion = null;
+        let isDetectionInProgress = false;
+        const emotionMap = {
+            'happy': 'happy',
+            'sad': 'sad',
+            'angry': 'angry',
+            'fearful': 'excited',
+            'disgusted': 'angry',
+            'surprised': 'excited',
+            'neutral': 'relaxed'
+        };
+        
+        // Start camera stream
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                
+                startBtn.disabled = true;
+                detectBtn.disabled = false;
+                detectionMessage.textContent = "Camera is ready. Click 'Detect Emotion' to analyze your current mood.";
+                
+            } catch (error) {
+                console.error("Error accessing camera:", error);
+                resultDiv.textContent = "Could not access camera. Please ensure you've granted permission.";
+            }
+        }
+        
+        // Detect emotion from video frame
+        function detectEmotion() {
+            if (isDetectionInProgress) return;
+            
+            isDetectionInProgress = true;
+            loadingDiv.style.display = 'block';
+            detectBtn.disabled = true;
+            detectionMessage.textContent = "Processing your emotion...";
+            resultDiv.textContent = "";
+            
+            // Simulate emotion detection (replace with actual model prediction)
+            setTimeout(() => {
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // For demo purposes, we'll simulate random detection
+                const emotions = ['happy', 'sad', 'angry', 'fearful', 'disgusted', 'surprised', 'neutral'];
+                const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+                currentEmotion = emotionMap[randomEmotion] || 'happy';
+                
+                loadingDiv.style.display = 'none';
+                isDetectionInProgress = false;
+                detectBtn.disabled = false;
+                recommendBtn.disabled = false;
+                
+                resultDiv.textContent = `Detected emotion: ${currentEmotion}`;
+                detectionMessage.textContent = "Click 'Get Recommendations' to see song suggestions or 'Detect Emotion' to try again.";
+            }, 2000); // 2 second detection delay for realism
+        }
+        
+        // Get recommendations based on detected emotion
+        function getRecommendations() {
+            if (currentEmotion) {
+                // Store the detected emotion in localStorage
+                localStorage.setItem("selectedEmotion", currentEmotion);
+                // Redirect to recommendations page
+                window.location.href = "recommendations.html";
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startCamera);
+        detectBtn.addEventListener('click', detectEmotion);
+        recommendBtn.addEventListener('click', getRecommendations);
+    </script>
+</body>
+</html>
